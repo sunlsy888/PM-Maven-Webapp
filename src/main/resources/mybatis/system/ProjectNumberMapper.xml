@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ProjectNumberMapper" >
+  <resultMap id="projectnumberResultMap" type="ProjectNumber" >
+    <id column="Id" property="Id" />
+    <result column="PId" property="PId"  />
+    <result column="UserId" property="UserId"  />
+    <result column="AddDate" property="AddDate"   />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    Id, PId, UserId, AddDate
+  </sql>
+ <!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+    select 
+    <include refid="Base_Column_List" />
+   
+    from tb_projectnumber
+    where Id = #{Id}
+  </select>
+  <delete id="delete" parameterType="pd">
+    delete from tb_projectnumber
+    where Id = #{Id}
+  </delete>
+  	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+    insert into tb_projectnumber (PId, UserId, AddDate
+      )
+    values (#{PId}, #{UserId}, #{AddDate}
+      )
+  </insert>
+  
+  
+  <update id="edit" parameterType="pd">
+    update tb_projectnumber
+    set PId = #{PId},
+      UserId = #{UserId}, 
+      AddDate = #{AddDate} 
+    where Id = #{Id}
+  </update>
+   
+
+   <!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.Id,	
+				a.PId,	
+				a.UserId,	
+				a.AddDate
+		from 
+				tb_projectnumber a
+		where 1 = 1
+		<if test="pd.PId != null and pd.PId != ''"><!-- 关键词检索 -->
+			and
+				(
+					 a.PId = #{pd.PId}
+				)
+		</if>
+		<if test="pd.KEYW != null and pd.KEYW != ''"><!-- 关键词检索 -->
+			and
+				(
+					 a.UserId LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+				)
+		</if>
+	</select>
+	<select id="datalistPageAll" parameterType="page" resultType="pd">
+		select 
+				a.*,b.*
+		from 
+			SYS_USER  a,tb_projectnumber b
+where   a.USER_ID=b.UserId
+<if test="pd.PId != null and pd.PId != ''"><!-- 关键词检索 -->
+			and
+				(
+					 b.PId = #{pd.PId}
+				)
+		</if>
+ and 
+USER_ID in(
+select UserId from  tb_projectnumber where 1 = 1
+
+<if test="pd.PId != null and pd.PId != ''"><!-- 关键词检索 -->
+			and
+				(
+					 PId = #{pd.PId}
+				)
+		</if> )
+		 
+		 
+	</select>
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.Id,	
+				a.PId,	
+				a.UserId,	
+				a.AddDate
+		from 
+				tb_projectnumber a
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from tb_projectnumber
+		where 
+			Id in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	
+ 
+	
+	 
+</mapper>

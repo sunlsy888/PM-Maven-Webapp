@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="WeeklyReportMapper" >
+ <!--  <resultMap id="WeeklyReportResultMap" type="Require" >
+    <id column="Id" property="Id" jdbcType="INTEGER" />
+    <result column="PName" property="PName" jdbcType="VARCHAR" />
+    <result column="PType" property="PType" jdbcType="VARCHAR" />
+    <result column="Requirement" property="Requirement" jdbcType="VARCHAR" />
+    <result column="PlanDate" property="PlanDate" jdbcType="VARCHAR" />
+    <result column="PM" property="PM" jdbcType="VARCHAR" />
+    <result column="ItemDetails" property="ItemDetails" jdbcType="VARCHAR" />
+    <result column="AddDate" property="AddDate" jdbcType="VARCHAR" /> 
+  </resultMap> -->
+  <sql id="Base_Column_List" >
+    Id, PName, PType, Requirement, PlanDate, PM, ItemDetails,  AddDate 
+  </sql>
+  <!-- 关键字查找 -->
+<select id="findById" resultType="pd" parameterType="pd">
+    select 
+    <include refid="Base_Column_List" /> 
+    from tb_weeklyreport
+    where Id = #{Id}
+  </select>
+  
+  	<!-- 根据PM批量获取 -->
+	<select id="getAllByPM" parameterType="page" resultType="pd">
+ 	select
+			  <include refid="Base_Column_List" /> 
+		from 
+				tb_weeklyreport
+				  where PM = #{PM}
+	</select>
+    
+  
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.*
+		from 
+				tb_weeklyreport a
+		where 1 = 1
+		 
+		<if test="pd.KEYW != null and pd.KEYW != ''"><!-- 关键词检索 -->
+			and
+				(
+					 a.PName LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+					 or 
+					 a.PM LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					 or
+					 a.PlanDate LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+					 or
+					 a.PType LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+				)
+		</if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+			  <include refid="Base_Column_List" /> 
+		from 
+				tb_weeklyreport
+	</select>
+	
+ 
+  
+  <!-- 删除 -->
+  <delete id="deleteforId" parameterType="pd" >
+    delete from tb_weeklyreport
+    where  Id = #{Id}
+  </delete>
+  	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from tb_weeklyreport
+		where 
+			 Id in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	
+  <!-- 新增 -->
+  <insert id="insert"  parameterType="pd" >
+    insert into tb_weeklyreport (PName, PType, Requirement, PlanDate, PM, ItemDetails,  AddDate  )
+    values ( #{PName}, #{PType}, 
+      #{Requirement}, #{PlanDate}, #{PM}, 
+      #{ItemDetails}, #{AddDate} )
+  </insert>
+  
+ 
+  <!-- 更新 -->
+  <update id="updateById"  parameterType="pd">
+    update tb_weeklyreport
+    set 
+      PName = #{PName}, 
+      PType = #{PType},
+      Requirement = #{Requirement},
+      PlanDate = #{PlanDate},
+      PM = #{PM},  
+      ItemDetails = #{ItemDetails}
+    where  Id = #{Id}
+  </update>
+ 
+</mapper>

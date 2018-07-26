@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ProjectPlanMapper" >
+  <resultMap id="BaseResultMap" type="ProjectPlan" >
+    <id column="plan_Id" property="planId" jdbcType="INTEGER" />
+    <result column="PId" property="pid" jdbcType="VARCHAR" />
+    <result column="Title" property="title" jdbcType="VARCHAR" />
+    <result column="State" property="state" jdbcType="VARCHAR" />
+    <result column="Ver" property="ver" jdbcType="VARCHAR" />
+    <result column="Priority" property="priority" jdbcType="VARCHAR" />
+    <result column="DPlanDate" property="dplandate" jdbcType="DATE" />
+    <result column="EndDate" property="enddate" jdbcType="DATE" />
+    <result column="IsVisible" property="isvisible" jdbcType="VARCHAR" />
+ <result column="Des" property="des" jdbcType="LONGVARCHAR" />
+    <result column="Remark" property="remark" jdbcType="LONGVARCHAR" />
+    <result column="Remark2" property="remark2" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    Plan_Id, PId, Title, State, Ver, Priority, DPlanDate, EndDate, IsVisible,
+    Des, Remark,AddDate,Remark2
+  </sql>
+  
+   <!-- 关键字查找 -->
+<select id="findById" resultType="pd" parameterType="pd">
+    select 
+    <include refid="Base_Column_List" /> 
+    from tb_projectplan
+    where Plan_Id = #{Plan_Id}
+  </select>
+  
+  	<!-- 根据PID批量获取 -->
+	<select id="getAllById" parameterType="page" resultType="pd">
+ 	select
+			  <include refid="Base_Column_List" /> 
+		from 
+				tb_projectplan
+				  where PId = #{pId}
+	</select>
+    
+  
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.*
+		from 
+				tb_projectplan a
+		where 1 = 1
+		<if test="pd.PId != null and pd.PId != ''"><!-- 关键词检索 -->
+			and
+				(
+					 a.PId =#{pd.PId} 
+				)
+		</if>
+		<if test="pd.KEYW != null and pd.KEYW != ''"><!-- 关键词检索 -->
+			and
+				(
+					 a.Ver LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+					 or
+					 a.State LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+					 or
+					 a.Priority LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+				)
+		</if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="page" resultType="pd">
+		select
+			  <include refid="Base_Column_List" /> 
+		from 
+				tb_projectplan  where 1 = 1 and PId=#{PId}
+	</select>
+	
+ 
+  
+  <!-- 删除 -->
+  <delete id="delete" parameterType="pd" >
+    delete from tb_projectplan
+    where Plan_Id = #{Plan_Id}
+  </delete>
+  	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from tb_projectplan
+		where 
+			Plan_Id in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	
+  <!-- 新增 -->
+  <insert id="insert"  parameterType="pd" >
+   insert into tb_projectplan (PId, Title, 
+      State, Ver, Priority, 
+      DPlanDate, IsVisible, 
+      Des,AddDate,Remark)
+    values (#{PId}, #{Title}, 
+      #{State}, #{Ver}, #{Priority}, 
+      #{DPlanDate}, #{IsVisible}, 
+      #{Des},#{AddDate},#{Remark})
+  </insert>
+  
+ 
+  <!-- 更新 -->
+  <update id="update"  parameterType="pd">
+    update tb_projectplan
+    set 
+      Title = #{Title}, 
+      Ver = #{Ver},
+      Priority = #{Priority},
+      DPlanDate = #{DPlanDate},  
+      Des = #{Des} ,
+       Remark = #{Remark} 
+    where Plan_Id = #{Plan_Id}
+  </update>
+  
+   <update id="updatepm"  parameterType="pd"  flushCache="false" >
+    update tb_projectplan
+    set   
+      State = #{State}, 
+      Remark2 = #{Remark2} ,
+      EndDate=#{EndDate}
+    where Plan_Id = #{Plan_Id}
+  </update>
+ 
+</mapper>

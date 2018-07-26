@@ -1,0 +1,10 @@
+{
+  "ide": {
+    
+  },
+  "ecmaVersion": 6,
+  "libs": [
+    "ecma5",
+    "browser"
+  ]
+}

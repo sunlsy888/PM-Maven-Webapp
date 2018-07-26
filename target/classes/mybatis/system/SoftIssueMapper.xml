@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="SoftIssueMapper" >
+ 
+  <sql id="Base_Column_List" >
+    Id, Title, ItemType, SubType, Priority, TestVer, TestDate, TestOne, FixPlan, DOne, 
+    RegressionTestingDate, RegressionTestingVer, RegressionTestingOne, State, CloseDate,
+    Content, Cause, Resolvent, Remark,PId
+  </sql>
+  <select id="findById"  resultType="pd" parameterType="pd" >
+    select 
+    <include refid="Base_Column_List" /> 
+    from tb_softissue
+    where Id = #{Id}
+  </select>
+  <!-- 根据ID批量获取 -->
+	<select id="getAllById" parameterType="page" resultType="pd">
+ 	select
+		  <include refid="Base_Column_List" />
+ 
+		from  tb_softissue
+		  where Id in #{Id} 
+	</select>
+	
+	
+	
+ <!-- 列表(全部) -->
+ <select id="listAll" parameterType="page" resultType="pd">
+		select * from  tb_softissue
+		 where 1 = 1 and PId=#{PId}
+				  
+	</select>
+ 
+ <!-- 列表模糊查询 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.*
+		from 
+				tb_softissue a
+		where 1 = 1   
+		<if test="pd.PId != null and pd.PId != ''"><!-- 关键词检索 -->
+			and
+				(
+					 a.PId =#{pd.PId} 
+				)
+		</if>  
+		<if test="pd.KEYW != null and pd.KEYW != ''"><!-- 关键词检索 -->
+			and
+				(
+				     a.Title LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+					 or 
+					 a.Content LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+					 or 
+					 a.ItemType LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					 or
+					 a.Priority LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					 or
+					 a.TestVer LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					  or
+					 a.State LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					  or
+					 a.FixPlan LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+				)
+		</if>
+	</select>
+  <!-- 列表精确查找 -->
+	<select id="getlistPage" parameterType="page" resultType="pd">
+		select
+				a.*
+		from 
+				tb_softissue a
+		where 1 = 1  and PId=#{PId}
+		<if test="pd.KEYW != null and pd.KEYW != ''"><!-- 关键词检索 -->
+			and
+				(
+				      a.Title LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+					 or 
+					 a.Content LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+					 or 
+					 a.ItemType LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					 or
+					 a.Priority LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					 or
+					 a.TestVer LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					  or
+					 a.State LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					  or
+					 a.FixPlan LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+				)
+		</if>
+	</select>
+ 
+  <!-- deleteforPNo -->
+  <delete id="deleteforPNo"  parameterType="pd"  flushCache="false" >
+    delete from tb_softissue
+    where PId = #{PId}
+  </delete>
+   <!-- deleteforId -->
+  <delete id="deleteforId"  parameterType="pd"  flushCache="false" >
+    delete from tb_softissue
+    where Id = #{ID}
+  </delete>
+    	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String"  flushCache="false">
+		delete from tb_softissue
+		where 
+			Id in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+  <insert id="insert"  parameterType="pd"  flushCache="false" >
+    insert into tb_softissue (PId, Title, ItemType, 
+       Priority, TestVer, TestDate, TestOne,  State,  Content)
+    values (#{PId}, #{Title}, #{ItemType}, 
+      #{Priority}, #{TestVer},  #{TestDate}, #{TestOne},  #{State},   #{Content})
+  </insert>
+  
+   <insert id="insertall"  parameterType="pd"  flushCache="false" >
+    insert into tb_softissue (PId, Title, ItemType, 
+      SubType, Priority, TestVer, 
+      TestDate, TestOne, FixPlan, 
+      DOne, RegressionTestingDate, RegressionTestingVer, 
+      RegressionTestingOne, State, CloseDate, 
+      Content, Cause, Resolvent, Remark)
+    values (#{PId}, #{Title}, #{ItemType}, 
+      #{SubType}, #{Priority}, #{TestVer}, 
+      #{TestDate}, #{TestOne}, #{FixPlan}, 
+      #{Done}, #{RegressionTestingDate}, #{RegressionTestingVer}, 
+      #{RegressionTestingOne}, #{State}, #{CloseDate}, 
+      #{Content}, #{Cause}, #{Resolvent}, 
+      #{Remark})
+  </insert>
+ 
+  <update id="updateById"  parameterType="pd"  flushCache="false" >
+    update tb_softissue
+    set Title = #{Title},
+      ItemType = #{ItemType},
+      Priority = #{Priority},
+      TestVer = #{TestVer}, 
+      TestOne = #{TestOne}, 
+      Content = #{Content} 
+    where Id = #{Id}
+  </update>
+ 
+   <update id="updateAllById"  parameterType="pd"  flushCache="false" >
+    update tb_softissue
+    set Title = #{Title},
+      ItemType = #{ItemType},
+      SubType = #{SubType},
+      Priority = #{Priority},
+      TestVer = #{TestVer},
+      TestDate = #{TestDate},
+      TestOne = #{TestOne},
+      FixPlan = #{FixPlan},
+      DOne = #{DOne},
+      RegressionTestingDate = #{RegressionTestingDate},
+      RegressionTestingVer = #{RegressionTestingVer},
+      RegressionTestingOne = #{RegressionTestingOne},
+      State = #{State},
+      CloseDate = #{CloseDate},
+      Content = #{Content},
+      Cause = #{Cause},
+      Resolvent = #{Resolvent},
+      Remark = #{Remark}
+    where Id = #{Id}
+  </update>
+   <update id="updateState"  parameterType="pd">
+    update tb_softissue
+    set 
+      State = #{State} ,CloseDate=#{CloseDate}
+    where Id = #{Id}
+  </update>
+  <update id="updatepm"  parameterType="pd"  flushCache="false" >
+    update tb_softissue
+    set  FixPlan = #{FixPlan},
+      DOne = #{DOne},
+      State = #{State},
+      Cause = #{Cause},
+      Resolvent = #{Resolvent},
+      Remark = #{Remark} ,
+      CloseDate=#{CloseDate}
+    where Id = #{Id}
+  </update>
+</mapper>

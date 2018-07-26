@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="TongjiMapper" > 
+  
+  <!-- tb_naviproject 开始 -->
+     <!-- 根据状态统计 SELECT COUNT(PState) as count ,PState FROM tb_naviproject   WHERE YEAR(PDate)=#{year}    GROUP BY PState -->
+   <select id="findPStateForNaviproject" parameterType="pd" resultType="pd">
+ SELECT PState,  COUNT(*) as count,YEAR(PDate) as year  FROM tb_naviproject WHERE YEAR(PDate)=#{year}  GROUP BY YEAR(PDate),PState 
+   </select>
+ 
+     <!-- 按日 同一日期 -->
+   <select id="findDateForNaviproject" parameterType="pd" resultType="pd">
+   SELECT COUNT(*) as count,DATE(PDate) as date FROM tb_naviproject WHERE YEAR(PDate)=#{year} GROUP BY DAY(PDate)
+   </select>
+   
+   <!-- 按周 -->
+   <select id="findWeekForNaviproject" parameterType="pd" resultType="pd">
+   SELECT COUNT(*) as count,WEEK(PDate) as week FROM tb_naviproject WHERE MONTH(PDate) = #{month}  GROUP BY WEEK(PDate) 
+   </select>
+   
+    <!-- 周一到周五每天的统计结果 -->
+   <select id="findDayNameForNaviproject" parameterType="pd" resultType="pd">
+   SELECT COUNT(*) as count,DAYNAME(PDate) as dayname FROM tb_naviproject WHERE YEAR(PDate) = #{year} GROUP BY DAYNAME(PDate) 
+   </select>
+   
+   
+      <!-- 统计本周数据 -->
+   <select id="findCurWeekForNaviproject" parameterType="pd" resultType="pd">
+   SELECT COUNT(*) as count FROM tb_naviproject WHERE MONTH(PDate) = MONTH(CURDATE()) AND WEEK(PDate) = WEEK(CURDATE())
+   </select>
+   
+   
+         <!-- 按月统计 -->
+   <select id="findMonthForNaviproject" parameterType="pd" resultType="pd">
+SELECT COUNT(*) as count,MONTH(PDate) as month FROM tb_naviproject WHERE YEAR(PDate) =#{year} GROUP BY MONTH(PDate) 
+   </select>
+   
+   
+            <!-- 统计本月数据 -->
+   <select id="findCurMonthForNaviproject" parameterType="pd" resultType="pd">
+   SELECT  PState,  COUNT(*) as count,MONTH(PDate) as month   FROM tb_naviproject
+ WHERE MONTH(PDate) = MONTH(CURDATE()) AND YEAR(PDate) = YEAR(CURDATE())
+GROUP BY MONTH(PDate),PState  
+   </select>
+   
+   
+             <!-- 按季统计 -->
+   <select id="findQuarterForNaviproject" parameterType="pd" resultType="pd">
+SELECT COUNT(*)  as count,QUARTER(PDate) as quarter FROM tb_naviproject WHERE YEAR(PDate) = #{year} GROUP BY QUARTER(PDate) 
+   </select>
+   
+            <!-- 按年统计 -->
+   <select id="findYearForNaviproject" parameterType="pd" resultType="pd">
+SELECT  COUNT(*) as count,YEAR(PDate) as year  FROM tb_naviproject  GROUP BY YEAR(PDate) 
+   </select>
+   
+   <!-- tb_naviproject 结束 -->
+   
+   
+     <!-- tb_require 开始 -->
+     <!-- 根据状态统计  -->
+   <select id="findStateForRequire" parameterType="pd" resultType="pd">
+ SELECT State,  COUNT(*) as count     FROM tb_require    GROUP BY  State 
+   </select>
+    <!-- tb_require 结束 -->
+   
+   
+       <!-- tb_softissue 开始 -->
+     <!-- 根据状态统计  -->
+   <select id="findStateForSoftIssue" parameterType="pd" resultType="pd">
+ SELECT State,  COUNT(*) as count     FROM tb_softissue    GROUP BY  State 
+   </select>
+    <!-- tb_softissue 结束 -->
+   
+   
+	<!-- 
+N天内记录
+WHERE TO_DAYS(NOW()) - TO_DAYS(时间字段) <= N
+当天的记录
+where date(时间字段)=date(now())
+ 或
+where to_days(时间字段) = to_days(now());
+
+ 查询一周：
+select * from table   where DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(column_time);
+
+ 查询一个月：
+select * from table where DATE_SUB(CURDATE(), INTERVAL INTERVAL 1 MONTH) <= date(column_time);
+
+
+
+查询'06-03'到'07-08'这个时间段内所有过生日的会员：
+   Select * From user Where
+DATE_FORMAT(birthday,'%m-%d') >= '06-03' and DATE_FORMAT(birthday,'%m-%d')
+<= '07-08';
+
+统计一季度数据，表时间字段为：savetime 
+group by concat(date_format(savetime, '%Y '),FLOOR((date_format(savetime, '%m ')+2)/3))
+ 或
+select YEAR(savetime)*10+((MONTH(savetime)-1) DIV 3) +1,count(*) 
+from yourTable
+group by YEAR(savetime)*10+((MONTH(savetime)-1) DIV 3) +1;
+
+ -->
+	 
+ 
+ 
+</mapper>

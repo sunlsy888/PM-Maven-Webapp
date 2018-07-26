@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="NaviProjectMapper" > 
+  <sql id="Base_Column_List" >
+    PNo, Id, PName, PManager, PDate, PState, PDataVer, PType, PLevel, PCustomer, SoftCompany, 
+    HardSolution, ProductType, ScreenResolution, Memory, OperSystem, Storage, PortRate, 
+    CPUType, CompilerEnv, EquipType, NaviPath, BindMode, ActMode, CPUFrequency, IsVisible, 
+    IsDelete, IsVerify,ItemType,PUpdateDate
+  </sql>
+  <sql id="Blob_Column_List" >
+    PSource, PRemark
+  </sql>
+  <!--findById id -->
+  <select id="findById"  resultType="pd" parameterType="pd" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from tb_naviproject
+    where Id = #{ID}   
+  </select>
+  
+    <select id="findByPId"  resultType="pd" parameterType="pd" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from tb_naviproject
+    where PNo = #{PId}   
+  </select>
+  
+  	<!-- 通过获取数据 -->
+	<select id="findByPN" parameterType="pd" resultType="pd" useCache="false">
+		select 
+			 <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+		from 
+			tb_naviproject
+		where 
+		  PName = #{PName} 
+		 
+	</select>  
+ <!-- 根据ID批量获取 -->
+	<select id="getAllById" parameterType="page" resultType="pd">
+ 	select
+		  <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+		from  tb_naviproject
+		  where Id in #{Id}   and IsVisible=1 and IsDelete=0 and IsVerify=1
+	</select>
+ <!-- 列表(全部) -->
+	<select id="listAll" parameterType="page" resultType="pd">
+		select
+		 <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+		from 
+				tb_naviproject
+		where 1 = 1 and IsVisible=1 and IsDelete=0 and IsVerify=1
+	</select>
+ 
+ <!-- 列表模糊查询 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.*
+		from 
+				tb_naviproject a
+		where 1 = 1  
+		  <if test="pd.PNo != null and pd.PNo != ''"><!-- 关键词检索 -->
+		 and a.PNo=#{pd.PNo} 
+		 </if>
+         <if test="pd.IsVisible != null and pd.IsVisible != ''"><!-- 关键词检索 -->
+		 and a.IsVisible=#{pd.IsVisible} 
+		 </if>
+		 <if test="pd.IsDelete != null and pd.IsDelete != ''"><!-- 关键词检索 -->
+		 and a.IsDelete=#{pd.IsDelete}
+		 </if>
+		 <if test="pd.IsVerify != null and pd.IsVerify != '' "><!-- 关键词检索 -->
+		  and a.IsVerify=#{pd.IsVerify}
+		 </if>
+		  <if test="pd.PManager != null and pd.PManager != '' "><!-- 关键词检索 -->
+		  and a.PManager=#{pd.PManager}
+		 </if>
+
+		<if test="pd.KEYW != null and pd.KEYW != ''"><!-- 关键词检索 -->
+			and
+				(
+				     a.PNo LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+					 or 
+					 a.PName LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+					 or 
+					 a.PManager LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					 or
+					 a.PState LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					 or
+					 a.PType LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					  or
+					 a.SoftCompany LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					  or
+					 a.PType LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+				)
+		</if>
+	</select>
+	
+	<select id="datalistPagecy" parameterType="page" resultType="pd">
+			select
+				a.* 
+		from 
+				tb_naviproject a 
+		where 1 = 1  and a.PNo IN
+        (SELECT PId FROM tb_projectnumber where UserId=#{pd.USER_ID}) 
+	 
+         <if test="pd.IsVisible != null and pd.IsVisible != ''"><!-- 关键词检索 -->
+		 and a.IsVisible=#{pd.IsVisible} 
+		 </if>
+		 <if test="pd.IsDelete != null and pd.IsDelete != ''"><!-- 关键词检索 -->
+		 and a.IsDelete=#{pd.IsDelete}
+		 </if>
+		 <if test="pd.IsVerify != null and pd.IsVerify != '' "><!-- 关键词检索 -->
+		  and a.IsVerify=#{pd.IsVerify}
+		 </if> 
+
+		<if test="pd.KEYW != null and pd.KEYW != ''"><!-- 关键词检索 -->
+			and
+				(
+				     a.PNo LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+					 or 
+					 a.PName LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+					 or 
+					 a.PManager LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					 or
+					 a.PState LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					 or
+					 a.PType LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					  or
+					 a.SoftCompany LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					  or
+					 a.PType LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+				)
+		</if>
+	</select>
+	
+  <!-- 列表精确查找 -->
+	<select id="getlistPage" parameterType="page" resultType="pd">
+		select
+				a.*
+		from 
+				tb_naviproject a
+		where 1 = 1
+		 <if test="pd.IsVisible != null and pd.IsVisible != ''"><!-- 关键词检索 -->
+		 and a.IsVisible=#{pd.IsVisible} 
+		 </if>
+		 <if test="pd.IsDelete != null and pd.IsDelete != ''"><!-- 关键词检索 -->
+		 and a.IsDelete=#{pd.IsDelete}
+		 </if>
+		 <if test="pd.IsVerify != null and pd.IsVerify != '' "><!-- 关键词检索 -->
+		  and a.IsVerify=#{pd.IsVerify}
+		 </if>
+		  <if test="pd.PManager != null and pd.PManager != '' "><!-- 关键词检索 -->
+		  and a.PManager=#{pd.PManager}
+		 </if>
+		<if test="pd.KEYW != null and pd.KEYW != ''"><!-- 关键词检索 -->
+			and
+				(
+				     a.PNo = #{PNo}
+					 or 
+					 a.PName = #{PName}
+					 or 
+					 a.PManager = #{PManager}
+					 or
+					 a.PState = #{PState}
+					 or
+					 a.PType = #{PType}
+					  or
+					 a.SoftCompany = #{SoftCompany}
+					  or
+					 a.PType = #{PType}
+				)
+		</if>
+	</select>
+ 
+  <!-- deleteforPNo -->
+  <delete id="deleteforPNo"  parameterType="pd"  flushCache="false" >
+    delete from tb_naviproject
+    where PNo = #{PNo}
+  </delete>
+   <!-- deleteforId -->
+  <delete id="deleteforId"  parameterType="pd"  flushCache="false" >
+    delete from tb_naviproject
+    where Id = #{ID}
+  </delete>
+    	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String"  flushCache="false">
+		delete from tb_naviproject
+		where 
+			Id in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+  
+  <insert id="insert"  parameterType="pd"  flushCache="false" >
+    insert into tb_naviproject (PNo,PName, 
+      PManager, PDate, PState, 
+      PDataVer, PType, PLevel, 
+      PCustomer, SoftCompany, HardSolution, 
+      ProductType, ScreenResolution, Memory, 
+      OperSystem, Storage, PortRate, 
+      CPUType, CompilerEnv, EquipType, 
+      NaviPath, BindMode, ActMode, 
+      CPUFrequency, IsVisible, IsDelete, 
+      IsVerify, PSource, PRemark,ItemType,PUpdateDate
+      )
+    values (#{PNo},#{PName}, 
+      #{PManager}, #{PDate}, #{PState}, 
+      #{PDataVer}, #{PType}, #{PLevel}, 
+      #{PCustomer}, #{SoftCompany}, #{HardSolution}, 
+      #{ProductType}, #{ScreenResolution}, #{Memory}, 
+      #{OperSystem}, #{Storage}, #{PortRate}, 
+      #{CPUType}, #{CompilerEnv}, #{EquipType}, 
+      #{NaviPath}, #{BindMode}, #{ActMode}, 
+      #{CPUFrequency}, #{IsVisible}, #{IsDelete}, 
+      #{IsVerify}, #{PSource}, #{PRemark},#{ItemType},#{PUpdateDate}
+      )
+  </insert>
+   
+ 
+  <update id="updateById"  parameterType="pd"  flushCache="false" >
+    update tb_naviproject
+    set 
+      PName = #{PName},
+      PManager = #{PManager}, 
+      PDataVer = #{PDataVer},
+      PType = #{PType},
+      PLevel = #{PLevel},
+      PCustomer = #{PCustomer},
+      SoftCompany = #{SoftCompany},
+      HardSolution = #{HardSolution},
+      ProductType = #{ProductType},
+      ScreenResolution = #{ScreenResolution},
+      Memory = #{Memory},
+      OperSystem = #{OperSystem},
+      Storage = #{Storage},
+      PortRate = #{PortRate},
+      CPUType = #{CPUType},
+      CompilerEnv = #{CompilerEnv},
+      EquipType = #{EquipType},
+      NaviPath = #{NaviPath},
+      BindMode = #{BindMode},
+      ActMode = #{ActMode},
+      CPUFrequency = #{CPUFrequency}, 
+      PSource=#{PSource},
+      PRemark=#{PRemark},
+      ItemType=#{ItemType},
+      PUpdateDate=#{PUpdateDate}
+    where Id = #{ID}
+  </update>
+  
+  
+  <update id="updateState"  parameterType="pd"  flushCache="false" >
+    update tb_naviproject
+    set   
+      PState=#{PState},PUpdateDate=#{PUpdateDate}
+    where Id in(#{item} )
+  </update>
+</mapper>

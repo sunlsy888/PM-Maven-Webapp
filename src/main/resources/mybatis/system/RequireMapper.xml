@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="RequireMapper" >
+ <!--  <resultMap id="RequireResultMap" type="Require" >
+    <id column="Require_Id" property="requireId" jdbcType="INTEGER" />
+    <result column="PId" property="pid" jdbcType="VARCHAR" />
+    <result column="SoftCompany" property="softcompany" jdbcType="VARCHAR" />
+    <result column="State" property="state" jdbcType="VARCHAR" />
+    <result column="Ver" property="ver" jdbcType="VARCHAR" />
+    <result column="ItemTitle" property="itemtitle" jdbcType="VARCHAR" />
+    <result column="SubItem" property="subitem" jdbcType="VARCHAR" />
+    <result column="Priority" property="priority" jdbcType="VARCHAR" />
+    <result column="SAuthor" property="sauthor" jdbcType="VARCHAR" />
+    <result column="SDate" property="sdate" jdbcType="DATE" />
+    <result column="DState" property="dstate" jdbcType="VARCHAR" />
+    <result column="DAuthor" property="dauthor" jdbcType="VARCHAR" />
+    <result column="DPlanDate" property="dplandate" jdbcType="DATE" />
+    <result column="EndDate" property="enddate" jdbcType="DATE" />
+    <result column="IsDefer" property="isdefer" jdbcType="VARCHAR" />
+    <result column="IsVisible" property="isvisible" jdbcType="VARCHAR" />
+    <result column="AddDate" property="adddate" jdbcType="DATE" /> 
+    <result column="Des" property="des" jdbcType="LONGVARCHAR" />
+    <result column="Remark" property="remark" jdbcType="LONGVARCHAR" />
+  </resultMap> -->
+  <sql id="Base_Column_List" >
+    Require_Id, PId, SoftCompany, State, Ver, ItemTitle, SubItem, Priority, SAuthor, 
+    SDate, DState, DAuthor, DPlanDate, EndDate, IsDefer, IsVisible, AddDate,
+    Des, Remark
+  </sql>
+  <!-- 关键字查找 -->
+<select id="findById" resultType="pd" parameterType="pd">
+    select 
+    <include refid="Base_Column_List" /> 
+    from tb_require
+    where Require_Id = #{Require_Id}
+  </select>
+  
+  	<!-- 根据PID批量获取 -->
+	<select id="getAllById" parameterType="page" resultType="pd">
+ 	select
+			  <include refid="Base_Column_List" /> 
+		from 
+				tb_require
+				  where PId = #{PId}
+	</select>
+    
+  
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+				a.Require_Id, a.PId, a.SoftCompany, a.State, a.Ver, a.ItemTitle, a.SubItem, a.Priority, a.SAuthor, 
+    a.SDate, a.DState, a.DAuthor, a.DPlanDate, a.EndDate, a.IsDefer, a.IsVisible, a.AddDate,
+    a.Des, a.Remark
+		from 
+				tb_require a
+		where 1 = 1
+		<if test="pd.PId != null and pd.PId != ''"><!-- 关键词检索 -->
+			and
+				(
+					 a.PId =#{pd.PId} 
+				)
+		</if>
+		<if test="pd.KEYW != null and pd.KEYW != ''"><!-- 关键词检索 -->
+			and
+				(
+					 a.Ver LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+					 or 
+					 a.ItemTitle LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%') 
+					 or
+					 a.State LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+					 or
+					 a.Priority LIKE CONCAT(CONCAT('%', #{pd.KEYW}),'%')
+				)
+		</if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll"  parameterType="page"  resultType="pd">
+		select
+			  <include refid="Base_Column_List" /> 
+		from 
+				tb_require where 1 = 1 and PId=#{PId}
+	</select>
+	
+ 
+  
+  <!-- 删除 -->
+  <delete id="delete" parameterType="pd" >
+    delete from tb_require
+    where Require_Id = #{requireId}
+  </delete>
+  	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		delete from tb_require
+		where 
+			Require_Id in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	
+  <!-- 新增 -->
+  <insert id="insert"  parameterType="pd" >
+    insert into tb_require (PId, SoftCompany, 
+      State, Ver, ItemTitle, 
+      SubItem, Priority,  
+      IsVisible, AddDate, Des,SAuthor, 
+    SDate )
+    values ( #{PId}, #{SoftCompany}, 
+      #{State}, #{Ver}, #{ItemTitle}, 
+      #{SubItem}, #{Priority}, 
+      #{IsVisible}, #{AddDate}, #{Des},#{SAuthor},#{SDate})
+  </insert>
+  
+ 
+  <!-- 更新 -->
+  <update id="update"  parameterType="pd">
+    update tb_require
+    set 
+      SoftCompany = #{SoftCompany}, 
+      Ver = #{Ver},
+      ItemTitle = #{ItemTitle},
+      SubItem = #{SubItem},
+      Priority = #{Priority},  
+      Des = #{Des}
+    where Require_Id = #{Require_Id}
+  </update>
+   <update id="updateState"  parameterType="pd">
+    update tb_require
+    set 
+      State = #{State} ,AddDate=#{AddDate}
+    where Require_Id = #{Require_Id}
+  </update>
+   <update id="updatepm"  parameterType="pd">
+    update tb_require
+    set 
+      State = #{State} ,AddDate=#{AddDate},DAuthor=#{DAuthor},DPlanDate=#{DPlanDate},Remark=#{Remark}
+    where Require_Id = #{Require_Id}
+  </update>
+</mapper>
